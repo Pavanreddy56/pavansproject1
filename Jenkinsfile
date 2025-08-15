@@ -56,7 +56,7 @@ pipeline {
 
         stage('Deploying App to Kubernetes') {
             steps {
-                withEnv(["KUBECONFIG=C:/ProgramData/Jenkins/.kube/config"]) {
+                withEnv(["KUBECONFIG=C:\Users\cheed\.kube\config"]) {
                     bat 'kubectl apply -f deploymentservice.yaml'
                 }
             }

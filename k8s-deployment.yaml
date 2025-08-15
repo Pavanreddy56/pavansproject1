@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-pavan-deployment
+  labels:
+    app: hello-pavan
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-pavan
+  template:
+    metadata:
+      labels:
+        app: hello-pavan
+    spec:
+      containers:
+        - name: hello-pavan
+          image: your-dockerhub-username/hello-pavan-cicd:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 8
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20

@@ -1,10 +1,9 @@
 pipeline {
-
     agent any
 
     tools {
-        maven 'Maven3'    // Your configured Maven in Jenkins
-        jdk 'JDK17'       // Your configured JDK in Jenkins
+        maven 'Maven3'    // Maven configured in Jenkins
+        jdk 'JDK17'       // JDK configured in Jenkins
     }
 
     environment {
@@ -23,15 +22,14 @@ pipeline {
         stage('Build with Maven') {
             steps {
                 bat 'mvn clean package -DskipTests'
-                bat 'dir target' // ✅ Verify jar exists
+                bat 'dir target'
             }
         }
 
         stage('Prepare Docker Context') {
             steps {
-                // Copy jar from target/ to workspace root for Docker build context
                 bat 'copy target\\*.jar .'
-                bat 'dir' // ✅ Confirm jar is here
+                bat 'dir'
             }
         }
 
@@ -48,7 +46,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                                                   usernameVariable: 'DOCKERHUB_USER',
                                                   passwordVariable: 'DOCKERHUB_PASS')]) {
-                    bat "echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin"
+                    bat "echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin"
                     bat "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                     bat "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
                     bat "docker push ${IMAGE_NAME}:latest"
@@ -58,13 +56,15 @@ pipeline {
 
         stage('Deploying App to Kubernetes') {
             steps {
-                script {
-                    kubernetesDeploy(
-                        configs: "deploymentservice.yaml",
-                        kubeconfigId: "kubernetes",
-                        bat 'kubectl apply -f deploymentservice.yaml'
-                    )
-                }
+                // First Jenkins plugin-based deployment
+                kubernetesDeploy(
+                    configs: "deploymentservice.yaml",
+                    kubeconfigId: "kubernetes"
+                )
+
+                // Then direct kubectl apply for visibility in console logs
+                bat 'kubectl config use-context minikube'
+                bat 'kubectl apply -f deploymentservice.yaml'
             }
         }
     }
@@ -78,3 +78,4 @@ pipeline {
         }
     }
 }
+

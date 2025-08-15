@@ -9,7 +9,6 @@ pipeline {
     environment {
         IMAGE_NAME = "pavanreddych/hello-pavan-cicd"
         IMAGE_TAG  = "${env.BUILD_NUMBER}"
-        KUBECONFIG = "C:/ProgramData/Jenkins/.kube/config"
     }
 
     stages {
@@ -57,11 +56,12 @@ pipeline {
 
         stage('Deploying App to Kubernetes') {
             steps {
-                withKubeConfig([credentialsId: 'kubernetes']) {
+                withEnv(["KUBECONFIG=C:/ProgramData/Jenkins/.kube/config"]) {
                     bat 'kubectl apply -f deploymentservice.yaml'
                 }
             }
         }
+
     }
 
     post {

@@ -16,7 +16,7 @@ pipeline {
 
         stage('Checkout Source') {
             steps {
-                git 'https://github.com/Pavanreddy56/pavansproject1.git'
+                git branch: 'main', url: 'https://github.com/Pavanreddy56/pavansproject1.git'
             }
         }
 

@@ -9,6 +9,7 @@ pipeline {
     environment {
         IMAGE_NAME = "pavanreddych/hello-pavan-cicd"
         IMAGE_TAG  = "${env.BUILD_NUMBER}"
+        KUBECONFIG = "C:/ProgramData/Jenkins/.kube/config"
     }
 
     stages {

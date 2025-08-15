@@ -7,5 +7,5 @@ RUN mvn -B -DskipTests package
 FROM eclipse-temurin:17-jre-alpine
 ARG JAR_FILE=/workspace/target/hello-pavan-cicd-1.0.0.jar
 COPY --from=build ${JAR_FILE} /app/app.jar
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["java","-jar","/app/app.jar"]

@@ -61,7 +61,8 @@ pipeline {
                 script {
                     kubernetesDeploy(
                         configs: "deploymentservice.yaml",
-                        kubeconfigId: "kubernetes"
+                        kubeconfigId: "kubernetes",
+                        bat 'kubectl apply -f deploymentservice.yaml'
                     )
                 }
             }

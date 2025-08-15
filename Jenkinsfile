@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker image') {
+        stage('Build Docker Image') {
             steps {
                 script {
                     bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
@@ -41,7 +41,7 @@ pipeline {
             }
         }
 
-        stage('Push Docker image') {
+        stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                                                   usernameVariable: 'DOCKERHUB_USER',
@@ -56,15 +56,9 @@ pipeline {
 
         stage('Deploying App to Kubernetes') {
             steps {
-                // First Jenkins plugin-based deployment
-                kubernetesDeploy(
-                    configs: "deploymentservice.yaml",
-                    kubeconfigId: "kubernetes"
-                )
-
-                // Then direct kubectl apply for visibility in console logs
-                bat 'kubectl config use-context minikube'
-                bat 'kubectl apply -f deploymentservice.yaml'
+                withKubeConfig([credentialsId: 'kubernetes']) {
+                    bat 'kubectl apply -f deploymentservice.yaml'
+                }
             }
         }
     }

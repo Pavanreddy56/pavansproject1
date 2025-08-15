@@ -9,6 +9,7 @@ pipeline {
     environment {
         IMAGE_NAME = "pavanreddych/hello-pavan-cicd"
         IMAGE_TAG  = "${env.BUILD_NUMBER}"
+        SONARQUBE_SERVER = "SonarQube"  // Jenkins SonarQube server name
     }
 
     stages {
@@ -23,6 +24,17 @@ pipeline {
             steps {
                 bat 'mvn clean package -DskipTests'
                 bat 'dir target'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            environment {
+                PATH = "${tool 'Maven3'}/bin;${env.PATH}"
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat 'mvn sonar:sonar -Dsonar.projectKey=pavansproject1 -Dsonar.host.url=http://127.0.0.1:63488/ -Dsonar.login=SonarQube'
+                }
             }
         }
 
@@ -69,7 +81,7 @@ pipeline {
             echo "✅ Deployment successful: ${IMAGE_NAME}:${IMAGE_TAG}"
         }
         failure {
-            echo "❌ Build or deployment failed"
+            echo "❌ Build, analysis, or deployment failed"
         }
     }
 }
